@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "booking": {
+      "title": "Booking",
+      "description": "Details of a wedding or event booking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique auto-generated booking number" },
+        "fullName": { "type": "string", "description": "Full name of the client" },
+        "phone": { "type": "string", "description": "WhatsApp/phone contact of the client" },
+        "eventDate": { "type": "string", "description": "Date of the wedding/event" },
+        "eventLocation": { "type": "string", "description": "Venue dynamic location" },
+        "packageType": { "type": "string", "description": "Name of the package booked" },
+        "notes": { "type": "string", "description": "Additional custom request notes" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "cancelled"], "description": "Current status of booking" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Booking submission timestamp" }
+      },
+      "required": ["fullName", "phone", "eventDate", "eventLocation", "packageType", "status", "createdAt"]
+    },
+    "package": {
+      "title": "Package",
+      "description": "Event coordination and styling package details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Stable dynamic ID of the package" },
+        "name": { "type": "string", "description": "Package name" },
+        "price": { "type": "string", "description": "Display price" },
+        "features": { "type": "string", "description": "Comma-separated list of features or JSON list" },
+        "description": { "type": "string", "description": "Package core benefits description" },
+        "order": { "type": "integer", "description": "Display ordering index" }
+      },
+      "required": ["name", "price", "features", "description"]
+    },
+    "gallery_item": {
+      "title": "Gallery Item",
+      "description": "Photographs and cinematic videos from curated portfolios",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Gallery document ID" },
+        "url": { "type": "string", "description": "Source image/video URL or asset placeholder" },
+        "type": { "type": "string", "enum": ["image", "video"], "description": "The item resource media type" },
+        "title": { "type": "string", "description": "Brief description of the wedding work" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Submission/upload date reference" }
+      },
+      "required": ["url", "type", "title", "createdAt"]
+    },
+    "testimonial": {
+      "title": "Testimonial",
+      "description": "Curated quote from elegant couples and events managed",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Testimonial dynamic ID" },
+        "clientName": { "type": "string", "description": "Name of the dynamic user" },
+        "role": { "type": "string", "description": "Role representation (e.g. Elegant Bride, Groom, Corporate)" },
+        "text": { "type": "string", "description": "Quote/comment feedback text body" },
+        "rating": { "type": "integer", "description": "Five star rating evaluation" }
+      },
+      "required": ["clientName", "role", "text", "rating"]
+    },
+    "settings_state": {
+      "title": "Settings State",
+      "description": "Dynamic control of website naming, logos, imagery, and copywriting values",
+      "type": "object",
+      "properties": {
+        "websiteName": { "type": "string", "description": "Dynamic website branding brand descriptor" },
+        "logoText": { "type": "string", "description": "Dynamic text to display inside the navbar/header" },
+        "heroTitle": { "type": "string", "description": "Title centered inside the hero cinematic segment" },
+        "heroSubtitle": { "type": "string", "description": "Subheading placed under the primary hero title" },
+        "aboutTitle": { "type": "string", "description": "About segment lead header copy" },
+        "aboutText": { "type": "string", "description": "Elegant describing paragraphs about Royal Vision history" },
+        "contactWhatsApp": { "type": "string", "description": "Direct dynamic WhatsApp link or contact value" },
+        "contactInstagram": { "type": "string", "description": "Curated Instagram portfolio handle username" },
+        "primaryColor": { "type": "string", "description": "Theme dynamic hex selection for gold highlighting" },
+        "darkBgColor": { "type": "string", "description": "Theme luxury dark background hex element value" },
+        "seoTitle": { "type": "string", "description": "Primary SEO meta title specification metadata" },
+        "seoDescription": { "type": "string", "description": "Meta description content targeted for SEO" }
+      },
+      "required": ["websiteName", "logoText", "heroTitle", "heroSubtitle", "aboutTitle", "aboutText", "contactWhatsApp", "contactInstagram"]
+    }
+  },
+  "firestore": {
+    "/bookings/{bookingId}": {
+      "schema": "booking",
+      "description": "Stores user event bookings with statuses and timestamps"
+    },
+    "/packages/{packageId}": {
+      "schema": "package",
+      "description": "Offers complete details of customizable luxury design services"
+    },
+    "/gallery/{galleryItemId}": {
+      "schema": "gallery_item",
+      "description": "Cinema films and beautiful shots loaded in the showcase section"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "testimonial",
+      "description": "Client experience comments posted for website trust"
+    },
+    "/settings/{settingsId}": {
+      "schema": "settings_state",
+      "description": "Central key-value dynamic dashboard state control document"
+    }
+  }
+}

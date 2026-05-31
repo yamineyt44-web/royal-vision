@@ -1,0 +1,121 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Safety Net - Deny all by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Premium Global Helper Guards ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admins are any signed-in users for this private database project
+    function isAdmin() {
+      return isSignedIn();
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Entity Specific Schemas ---
+    function isValidBooking(data) {
+      return data.keys().hasAll(['id', 'fullName', 'phone', 'eventDate', 'eventLocation', 'packageType', 'notes', 'status', 'createdAt'])
+        && data.keys().size() == 9
+        && data.id is string && data.id.size() <= 100
+        && data.fullName is string && data.fullName.size() <= 120 && data.fullName.size() > 0
+        && data.phone is string && data.phone.size() <= 30 && data.phone.size() > 0
+        && data.eventDate is string && data.eventDate.size() <= 100 && data.eventDate.size() > 0
+        && data.eventLocation is string && data.eventLocation.size() <= 200 && data.eventLocation.size() > 0
+        && data.packageType is string && data.packageType.size() <= 100
+        && data.notes is string && data.notes.size() <= 1000
+        && data.status in ['pending', 'confirmed', 'cancelled']
+        && data.createdAt is string;
+    }
+
+    function isValidPackage(data) {
+      return data.keys().hasAll(['id', 'name', 'price', 'features', 'description', 'order'])
+        && data.keys().size() == 6
+        && data.id is string && data.id.size() <= 100
+        && data.name is string && data.name.size() <= 100 && data.name.size() > 0
+        && data.price is string && data.price.size() <= 50
+        && data.features is list
+        && data.description is string && data.description.size() <= 1000
+        && data.order is int;
+    }
+
+    function isValidGalleryItem(data) {
+      return data.keys().hasAll(['id', 'url', 'type', 'title', 'createdAt'])
+        && data.keys().size() == 5
+        && data.id is string && data.id.size() <= 100
+        && data.url is string && data.url != ""
+        && data.type in ['image', 'video']
+        && data.title is string && data.title.size() <= 300
+        && data.createdAt is string;
+    }
+
+    function isValidTestimonial(data) {
+      return data.keys().hasAll(['id', 'clientName', 'role', 'text', 'rating'])
+        && data.keys().size() == 5
+        && data.id is string && data.id.size() <= 100
+        && data.clientName is string && data.clientName.size() <= 100 && data.clientName.size() > 0
+        && data.role is string && data.role.size() <= 100
+        && data.text is string && data.text.size() <= 1000 && data.text.size() > 0
+        && data.rating is int && data.rating >= 1 && data.rating <= 5;
+    }
+
+    function isValidSettings(data) {
+      return data.keys().hasAll(['websiteName', 'logoText', 'heroTitle', 'heroSubtitle', 'aboutTitle', 'aboutText', 'contactWhatsApp', 'contactInstagram', 'primaryColor', 'darkBgColor', 'seoTitle', 'seoDescription'])
+        && data.keys().size() == 12
+        && data.websiteName is string && data.websiteName.size() <= 100
+        && data.logoText is string && data.logoText.size() <= 50
+        && data.heroTitle is string && data.heroTitle.size() <= 300
+        && data.heroSubtitle is string && data.heroSubtitle.size() <= 500
+        && data.aboutTitle is string && data.aboutTitle.size() <= 200
+        && data.aboutText is string && data.aboutText.size() <= 2000
+        && data.contactWhatsApp is string && data.contactWhatsApp.size() <= 50
+        && data.contactInstagram is string && data.contactInstagram.size() <= 50
+        && data.primaryColor is string && data.primaryColor.size() <= 30
+        && data.darkBgColor is string && data.darkBgColor.size() <= 30
+        && data.seoTitle is string && data.seoTitle.size() <= 150
+        && data.seoDescription is string && data.seoDescription.size() <= 300;
+    }
+
+    // --- Bookings Collection Rules ---
+    match /bookings/{bookingId} {
+      allow create: if isValidId(bookingId) && isValidBooking(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // --- Packages Collection Rules ---
+    match /packages/{packageId} {
+      allow read: if true;
+      allow delete: if isAdmin() && isValidId(packageId);
+      allow create, update: if isAdmin() && isValidId(packageId) && isValidPackage(request.resource.data);
+    }
+
+    // --- Gallery Collection Rules ---
+    match /gallery/{galleryItemId} {
+      allow read: if true;
+      allow delete: if isAdmin() && isValidId(galleryItemId);
+      allow create, update: if isAdmin() && isValidId(galleryItemId) && isValidGalleryItem(request.resource.data);
+    }
+
+    // --- Testimonials Collection Rules ---
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow delete: if isAdmin() && isValidId(testimonialId);
+      allow create, update: if isAdmin() && isValidId(testimonialId) && isValidTestimonial(request.resource.data);
+    }
+
+    // --- Settings Collection Rules ---
+    match /settings/{settingsId} {
+      allow read: if true;
+      allow delete: if isAdmin() && isValidId(settingsId);
+      allow create, update: if isAdmin() && isValidId(settingsId) && isValidSettings(request.resource.data);
+    }
+  }
+}

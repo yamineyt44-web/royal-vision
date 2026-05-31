@@ -1,0 +1,6 @@
+{
+  "name": "Royal Vision",
+  "description": "Premium luxury wedding and event booking website featuring package comparisons, an admin dashboard, and custom WhatsApp booking workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
